@@ -72,7 +72,8 @@
         <div class="container-fluid">
             <a class="navbar-brand me-auto" href="/">
                 <img id="logolight" src="assets/logo.png" alt="logo" class="img-fluid m-0 p-0" style="height: 50px;" />
-                <img id="logodark" src="assets/dark.png" alt="logo" class="img-fluid m-0 p-0 d-none" style="height: 50px;" />
+                <img id="logodark" src="assets/dark.png" alt="logo" class="img-fluid m-0 p-0 d-none"
+                    style="height: 50px;" />
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -164,8 +165,10 @@
 
     <div class="content">
         <div class="position-absolute top-0 start-50 translate-middle">
-            <img id="logolight2" class="bg-body" src="assets/logo1.png" alt="rsuph" style="width: 200px; height: 200px; border-radius: 100%;">
-            <img id="logodark2" class="bg-body d-none" src="assets/logo2.png" alt="rsuph" style="width: 200px; height: 200px; border-radius: 100%;">
+            <img id="logolight2" class="bg-body" src="assets/logo1.png" alt="rsuph"
+                style="width: 200px; height: 200px; border-radius: 100%;">
+            <img id="logodark2" class="bg-body d-none" src="assets/logo2.png" alt="rsuph"
+                style="width: 200px; height: 200px; border-radius: 100%;">
         </div>
         <div class="py-5"></div>
         <div class="container bg-body-tertiary border rounded p-4">
@@ -180,7 +183,7 @@
                 <div class="col">
                     <h4>Unggah Foto</h4>
                     <input type="file" id="file-input" class="form-control mb-3" accept="image/*">
-                    <button id="download-btn" class="btn btn-primary">Download Twibbon</button>
+                    <button id="download-btn" class="btn btn-primary" disabled>Download Twibbon</button>
                 </div>
             </div>
             <canvas id="final-canvas"></canvas>
@@ -203,6 +206,9 @@
                 uploadedImage.src = URL.createObjectURL(file);
                 imgX = imgY = 0;
                 uploadedImage.style.transform = `translate(${imgX}px, ${imgY}px)`;
+                document.getElementById('download-btn').disabled = false;
+            } else {
+                document.getElementById('download-btn').disabled = true;
             }
         });
 
@@ -232,16 +238,19 @@
             isDragging = true;
             startX = e.touches[0].clientX - imgX;
             startY = e.touches[0].clientY - imgY;
-        });
+        }, { passive: false });
 
+        // Saat geser
         uploadedImage.addEventListener('touchmove', (e) => {
             if (isDragging) {
+                e.preventDefault(); // ❌ mencegah scroll layar
                 imgX = e.touches[0].clientX - startX;
                 imgY = e.touches[0].clientY - startY;
                 uploadedImage.style.transform = `translate(${imgX}px, ${imgY}px)`;
             }
-        });
+        }, { passive: false });
 
+        // Selesai drag
         uploadedImage.addEventListener('touchend', () => {
             isDragging = false;
         });
@@ -257,7 +266,13 @@
             img.src = uploadedImage.src;
             img.onload = () => {
                 ctx.clearRect(0, 0, size, size);
-                ctx.drawImage(img, imgX, imgY, size, size);
+
+                // Hitung rasio asli
+                let scale = Math.max(size / img.width, size / img.height);
+                let drawWidth = img.width * scale;
+                let drawHeight = img.height * scale;
+
+                ctx.drawImage(img, imgX, imgY, drawWidth, drawHeight);
 
                 const overlay = new Image();
                 overlay.src = frameOverlay.src;
