@@ -32,37 +32,6 @@
             vertical-align: -.125em;
             fill: currentColor;
         }
-
-        #frame-container {
-            position: relative;
-            width: 100%;
-            padding-top: 100%;
-            background: #eee;
-            overflow: hidden;
-        }
-
-        #uploaded-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            cursor: grab;
-            width: 100%;
-            height: auto;
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-
-        #frame-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            pointer-events: none;
-        }
-
-        canvas {
-            display: none;
-        }
     </style>
 </head>
 
@@ -175,9 +144,10 @@
             <div class="w-100 text-center fs-2 fw-bold mb-5">Twibbon HUT Permata Hati Ke-18</div>
             <div class="row row-cols-1 row-cols-lg-2 g-4">
                 <div class="col">
-                    <div id="frame-container">
-                        <img id="uploaded-image" src="" alt="">
-                        <img id="frame-overlay" src="assets/twibbon-frame.png" alt="Frame">
+                    <div class="w-100 d-flex justify-content-center align-items-center">
+                        <img id="imgframe" src="frame.png" alt="frame" style="height: 500px; width: 500px;">
+                        <canvas class="d-none" id="editor-canvas" width="500" height="500"
+                            style="border:1px solid #ccc; max-width:100%;"></canvas>
                     </div>
                 </div>
                 <div class="col">
@@ -192,109 +162,171 @@
     </div>
 
     <script>
-        const fileInput = document.getElementById('file-input');
-        const uploadedImage = document.getElementById('uploaded-image');
-        const frameOverlay = document.getElementById('frame-overlay');
-        const canvas = document.getElementById('final-canvas');
+        const canvas = document.getElementById('editor-canvas');
+        const imgframe = document.getElementById('imgframe');
         const ctx = canvas.getContext('2d');
-        let isDragging = false, startX, startY, imgX = 0, imgY = 0;
+        const fileInput = document.getElementById('file-input');
+        const downloadBtn = document.getElementById('download-btn');
 
-        // Upload
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                uploadedImage.src = URL.createObjectURL(file);
-                imgX = imgY = 0;
-                uploadedImage.style.transform = `translate(${imgX}px, ${imgY}px)`;
-                document.getElementById('download-btn').disabled = false;
-            } else {
-                document.getElementById('download-btn').disabled = true;
+        let img = null;
+        let imgX = 0, imgY = 0, scale = 1;
+        let isDragging = false, startX = 0, startY = 0;
+        let pinchStartDist = 0, initialScale = 1;
+
+        // Frame overlay
+        const frameOverlay = new Image();
+        frameOverlay.src = 'frame.png';
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Masking lingkaran
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+
+            if (img) {
+                const drawW = img.width * scale;
+                const drawH = img.height * scale;
+                ctx.drawImage(img, imgX, imgY, drawW, drawH);
             }
+
+            ctx.restore();
+
+            // Overlay frame
+            ctx.drawImage(frameOverlay, 0, 0, canvas.width, canvas.height);
+        }
+
+        // Upload gambar
+        fileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                img = new Image();
+                img.onload = () => {
+                    // Atur posisi awal di tengah
+                    scale = Math.max(
+                        canvas.width / img.width,
+                        canvas.height / img.height
+                    );
+                    imgX = (canvas.width - img.width * scale) / 2;
+                    imgY = (canvas.height - img.height * scale) / 2;
+                    draw();
+                    downloadBtn.disabled = false;
+                    imgframe.classList.add('d-none');
+                    canvas.classList.remove('d-none');
+                };
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
         });
 
-        // Event drag mouse
-        uploadedImage.addEventListener('mousedown', (e) => {
+        // Drag mouse
+        canvas.addEventListener('mousedown', e => {
             isDragging = true;
             startX = e.clientX - imgX;
             startY = e.clientY - imgY;
-            uploadedImage.style.cursor = 'grabbing';
         });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', e => {
+            if (isDragging && img) {
                 imgX = e.clientX - startX;
                 imgY = e.clientY - startY;
-                uploadedImage.style.transform = `translate(${imgX}px, ${imgY}px)`;
+                draw();
             }
         });
 
-        document.addEventListener('mouseup', () => {
-            isDragging = false;
-            uploadedImage.style.cursor = 'grab';
-        });
+        // Zoom mouse scroll
+        canvas.addEventListener('wheel', e => {
+            if (!img) return;
+            e.preventDefault();
+            const zoom = e.deltaY < 0 ? 1.05 : 0.95;
 
-        // Event drag for touchscreen
-        uploadedImage.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            startX = e.touches[0].clientX - imgX;
-            startY = e.touches[0].clientY - imgY;
+            // Zoom ke arah posisi mouse
+            const mouseX = e.offsetX;
+            const mouseY = e.offsetY;
+            imgX = mouseX - (mouseX - imgX) * zoom;
+            imgY = mouseY - (mouseY - imgY) * zoom;
+
+            scale *= zoom;
+            draw();
         }, { passive: false });
 
-        // Saat geser
-        uploadedImage.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                e.preventDefault(); // ❌ mencegah scroll layar
+        // Touch untuk drag & pinch
+        canvas.addEventListener('touchstart', e => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - imgX;
+                startY = e.touches[0].clientY - imgY;
+            } else if (e.touches.length === 2) {
+                pinchStartDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', e => {
+            if (!img) return;
+            if (e.touches.length === 1 && isDragging) {
+                e.preventDefault();
                 imgX = e.touches[0].clientX - startX;
                 imgY = e.touches[0].clientY - startY;
-                uploadedImage.style.transform = `translate(${imgX}px, ${imgY}px)`;
+                draw();
+            } else if (e.touches.length === 2) {
+                e.preventDefault();
+                const newDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const pinchZoom = newDist / pinchStartDist;
+                scale = initialScale * pinchZoom;
+                draw();
             }
         }, { passive: false });
 
-        // Selesai drag
-        uploadedImage.addEventListener('touchend', () => {
-            isDragging = false;
-        });
+        canvas.addEventListener('touchend', () => isDragging = false);
 
         // Download
-        document.getElementById('download-btn').addEventListener('click', () => {
-            if (!uploadedImage.src) return;
+        downloadBtn.addEventListener('click', () => {
+            if (!img) return;
 
-            const size = 1080; // resolusi hasil
-            canvas.width = size;
-            canvas.height = size;
+            const size = 1080;
+            const exportCanvas = document.createElement('canvas');
+            const exportCtx = exportCanvas.getContext('2d');
+            exportCanvas.width = size;
+            exportCanvas.height = size;
 
-            const img = new Image();
-            img.src = uploadedImage.src;
-            img.onload = () => {
-                ctx.clearRect(0, 0, size, size);
+            exportCtx.save();
+            exportCtx.beginPath();
+            exportCtx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            exportCtx.closePath();
+            exportCtx.clip();
 
-                // Ukuran asli gambar di preview
-                const containerSize = document.getElementById('frame-container').offsetWidth;
-                const scale = size / containerSize; // konversi posisi dari preview ke resolusi download
+            // Hitung skala berdasarkan perbandingan ukuran canvas preview dengan export size
+            const scaleFactor = size / canvas.width;
+            exportCtx.drawImage(
+                img,
+                imgX * scaleFactor,
+                imgY * scaleFactor,
+                img.width * scale * scaleFactor,
+                img.height * scale * scaleFactor
+            );
 
-                const imgWidth = uploadedImage.naturalWidth * (uploadedImage.width / uploadedImage.naturalWidth) * scale;
-                const imgHeight = uploadedImage.naturalHeight * (uploadedImage.height / uploadedImage.naturalHeight) * scale;
+            exportCtx.restore();
 
-                ctx.drawImage(
-                    img,
-                    imgX * scale, // posisi X disesuaikan
-                    imgY * scale, // posisi Y disesuaikan
-                    imgWidth,
-                    imgHeight
-                );
+            exportCtx.drawImage(frameOverlay, 0, 0, size, size);
 
-                const overlay = new Image();
-                overlay.src = frameOverlay.src;
-                overlay.onload = () => {
-                    ctx.drawImage(overlay, 0, 0, size, size);
-                    const link = document.createElement('a');
-                    link.download = 'twibbon.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                };
-            };
+            const link = document.createElement('a');
+            link.download = 'twibbon.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
         });
-
     </script>
 
 </body>
