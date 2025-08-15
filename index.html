@@ -13,7 +13,7 @@
     <script src="assets/color-modes.js"></script>
     <style>
         .parallax {
-            height: 50vh;
+            min-height: 50vh;
             background-image: url('assets/bg.jpg');
             background-attachment: fixed;
             background-size: cover;
@@ -177,16 +177,15 @@
                         <img id="frame-overlay" src="assets/twibbon-frame.png" alt="Frame">
                     </div>
                 </div>
-
                 <div class="col">
                     <h4>Unggah Foto</h4>
                     <input type="file" id="file-input" class="form-control mb-3" accept="image/*">
                     <button id="download-btn" class="btn btn-primary">Download Twibbon</button>
                 </div>
             </div>
-
             <canvas id="final-canvas"></canvas>
         </div>
+        <div class="container text-center text-secondary fs-6 fw-bold mt-3 py-3"> RSU Permata Hati 2025</div>
     </div>
 
     <script>
