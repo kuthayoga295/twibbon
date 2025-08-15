@@ -30,6 +30,8 @@
     const updateLogo = theme => {
         const logolight = document.getElementById('logolight')
         const logodark = document.getElementById('logodark')
+        const logolight2 = document.getElementById('logolight2')
+        const logodark2 = document.getElementById('logodark2')
 
         if (!logolight || !logodark) return
 
@@ -39,6 +41,16 @@
         } else {
             logolight.classList.remove('d-none')
             logodark.classList.add('d-none')
+        }
+
+        if (!logolight2 || !logodark2) return
+
+        if (theme === 'dark') {
+            logolight2.classList.add('d-none')
+            logodark2.classList.remove('d-none')
+        } else {
+            logolight2.classList.remove('d-none')
+            logodark2.classList.add('d-none')
         }
     }
 

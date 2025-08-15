@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Twibbon Drag</title>
+    <title>Twibbon RSUPH</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
@@ -24,7 +24,7 @@
             position: relative;
             z-index: 1;
             min-height: 100vh;
-            padding: 40px 0;
+            padding: 50px 0;
             margin: 0;
         }
 
@@ -68,6 +68,73 @@
 
 <body>
 
+    <nav class="navbar navbar-expand-lg bg-body border-bottom fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand me-auto" href="/">
+                <img id="logolight" src="assets/logo.png" alt="logo" class="img-fluid m-0 p-0" style="height: 50px;" />
+                <img id="logodark" src="assets/dark.png" alt="logo" class="img-fluid m-0 p-0 d-none" style="height: 50px;" />
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav gap-md-2 ms-md-auto">
+                    <li class="nav-item dropdown bd-mode-toggle">
+                        <a class="nav-link icon-link icon-link-hover d-flex align-items-center gap-2" id="bd-theme"
+                            type="button" aria-expanded="true" data-bs-toggle="dropdown"
+                            aria-label="Toggle theme (light)">
+                            <svg class="bi theme-icon-active" width="1em" height="1em">
+                                <use href="#sun-fill"></use>
+                            </svg>
+                            <span id="bd-theme-text">Theme</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center active"
+                                    data-bs-theme-value="light" aria-pressed="true">
+                                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                                        <use href="#sun-fill"></use>
+                                    </svg>
+                                    Light
+                                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                                        <use href="#check2"></use>
+                                    </svg>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                    data-bs-theme-value="dark" aria-pressed="false">
+                                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                                        <use href="#moon-stars-fill"></use>
+                                    </svg>
+                                    Dark
+                                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                                        <use href="#check2"></use>
+                                    </svg>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                    data-bs-theme-value="auto" aria-pressed="false">
+                                    <svg class="bi me-2 opacity-50" width="1em" height="1em">
+                                        <use href="#circle-half"></use>
+                                    </svg>
+                                    Auto
+                                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                                        <use href="#check2"></use>
+                                    </svg>
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
         <symbol id="check2" viewBox="0 0 16 16">
             <path
@@ -96,76 +163,12 @@
     <div class="parallax"></div>
 
     <div class="content">
-        <nav class="navbar navbar-expand-lg bg-body border-bottom fixed-top">
-            <div class="container-fluid">
-                <a class="navbar-brand me-auto" href="/">
-                    <img id="logolight" src="assets/logo.png" alt="logo" class="img-fluid m-0 p-0"
-                        style="height: 40px;" />
-                    <img id="logodark" src="assets/dark.png" alt="logo" class="img-fluid m-0 p-0 d-none"
-                        style="height: 40px;" />
-                </a>
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav gap-md-2 ms-md-auto">
-                        <li class="nav-item dropdown bd-mode-toggle">
-                            <a class="nav-link icon-link icon-link-hover d-flex align-items-center gap-2" id="bd-theme"
-                                type="button" aria-expanded="true" data-bs-toggle="dropdown"
-                                aria-label="Toggle theme (light)">
-                                <svg class="bi theme-icon-active" width="1em" height="1em">
-                                    <use href="#sun-fill"></use>
-                                </svg>
-                                <span id="bd-theme-text">Theme</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme-text">
-                                <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center active"
-                                        data-bs-theme-value="light" aria-pressed="true">
-                                        <svg class="bi me-2 opacity-50" width="1em" height="1em">
-                                            <use href="#sun-fill"></use>
-                                        </svg>
-                                        Light
-                                        <svg class="bi ms-auto d-none" width="1em" height="1em">
-                                            <use href="#check2"></use>
-                                        </svg>
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center"
-                                        data-bs-theme-value="dark" aria-pressed="false">
-                                        <svg class="bi me-2 opacity-50" width="1em" height="1em">
-                                            <use href="#moon-stars-fill"></use>
-                                        </svg>
-                                        Dark
-                                        <svg class="bi ms-auto d-none" width="1em" height="1em">
-                                            <use href="#check2"></use>
-                                        </svg>
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="dropdown-item d-flex align-items-center"
-                                        data-bs-theme-value="auto" aria-pressed="false">
-                                        <svg class="bi me-2 opacity-50" width="1em" height="1em">
-                                            <use href="#circle-half"></use>
-                                        </svg>
-                                        Auto
-                                        <svg class="bi ms-auto d-none" width="1em" height="1em">
-                                            <use href="#check2"></use>
-                                        </svg>
-                                    </button>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <div class="container bg-body-tertiary border rounded shadow p-4">
+        <div class="position-absolute top-0 start-50 translate-middle">
+            <img id="logolight2" class="bg-body" src="assets/logo1.png" alt="rsuph" style="width: 200px; height: 200px; border-radius: 100%;">
+            <img id="logodark2" class="bg-body d-none" src="assets/logo2.png" alt="rsuph" style="width: 200px; height: 200px; border-radius: 100%;">
+        </div>
+        <div class="py-5"></div>
+        <div class="container bg-body-tertiary border rounded p-4">
             <div class="w-100 text-center fs-2 fw-bold mb-5">Twibbon HUT Permata Hati Ke-18</div>
             <div class="row row-cols-1 row-cols-lg-2 g-4">
                 <div class="col">
