@@ -258,7 +258,8 @@
         // Download
         document.getElementById('download-btn').addEventListener('click', () => {
             if (!uploadedImage.src) return;
-            const size = 1080;
+
+            const size = 1080; // resolusi hasil
             canvas.width = size;
             canvas.height = size;
 
@@ -267,12 +268,20 @@
             img.onload = () => {
                 ctx.clearRect(0, 0, size, size);
 
-                // Hitung rasio asli
-                let scale = Math.max(size / img.width, size / img.height);
-                let drawWidth = img.width * scale;
-                let drawHeight = img.height * scale;
+                // Ukuran asli gambar di preview
+                const containerSize = document.getElementById('frame-container').offsetWidth;
+                const scale = size / containerSize; // konversi posisi dari preview ke resolusi download
 
-                ctx.drawImage(img, imgX, imgY, drawWidth, drawHeight);
+                const imgWidth = uploadedImage.naturalWidth * (uploadedImage.width / uploadedImage.naturalWidth) * scale;
+                const imgHeight = uploadedImage.naturalHeight * (uploadedImage.height / uploadedImage.naturalHeight) * scale;
+
+                ctx.drawImage(
+                    img,
+                    imgX * scale, // posisi X disesuaikan
+                    imgY * scale, // posisi Y disesuaikan
+                    imgWidth,
+                    imgHeight
+                );
 
                 const overlay = new Image();
                 overlay.src = frameOverlay.src;
@@ -285,6 +294,7 @@
                 };
             };
         });
+
     </script>
 
 </body>
