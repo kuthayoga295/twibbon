@@ -309,6 +309,9 @@
             exportCanvas.width = size;
             exportCanvas.height = size;
 
+            exportCtx.fillStyle = "#ffffff";
+            exportCtx.fillRect(0, 0, size, size);
+
             exportCtx.save();
             exportCtx.beginPath();
             exportCtx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
