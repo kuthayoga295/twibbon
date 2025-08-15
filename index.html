@@ -197,7 +197,7 @@
         const ctx = canvas.getContext('2d');
         let isDragging = false, startX, startY, imgX = 0, imgY = 0;
 
-        // Upload foto
+        // Upload
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -228,7 +228,7 @@
             uploadedImage.style.cursor = 'grab';
         });
 
-        // Event drag untuk touchscreen
+        // Event drag for touchscreen
         uploadedImage.addEventListener('touchstart', (e) => {
             isDragging = true;
             startX = e.touches[0].clientX - imgX;
@@ -247,7 +247,7 @@
             isDragging = false;
         });
 
-        // Download hasil
+        // Download
         document.getElementById('download-btn').addEventListener('click', () => {
             if (!uploadedImage.src) return;
             const size = 1080;
